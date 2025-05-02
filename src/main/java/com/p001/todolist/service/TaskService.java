@@ -36,18 +36,36 @@ public class TaskService {
    return task;
   };
 
-  
   return jdbcTemplate.query(sql, rowMapper, userId);
  }
 
- public int updateStatus(List<Integer> taskIds) {
-  if (taskIds == null || taskIds.isEmpty()) {
+ public int updateStatus(List<Integer> taskIds, Long userId) {
+  if (userId == null) {
    return 0;
   }
- 
-  String placeholders = String.join(",", taskIds.stream().map(id -> "?").toList());
-  String sql = "UPDATE task SET status = 1 WHERE id IN (" + placeholders + ")";
-  return jdbcTemplate.update(sql, taskIds.toArray());
+  int updatedRows = 0;
+  if (taskIds != null && !taskIds.isEmpty()) {
+   String placeholders = String.join(",", taskIds.stream().map(id -> "?").toList());
+   String sqlSet1 = "UPDATE task SET status = 1 WHERE user_id = ? AND id IN (" + placeholders + ")";
+   Object[] params1 = new Object[taskIds.size() + 1];
+   params1[0] = userId;
+   for (int i = 0; i < taskIds.size(); i++) {
+    params1[i + 1] = taskIds.get(i);
+   }
+   updatedRows += jdbcTemplate.update(sqlSet1, params1);
+   String sqlSet0 = "UPDATE task SET status = 0 WHERE user_id = ? AND id NOT IN (" + placeholders + ")";
+   Object[] params2 = new Object[taskIds.size() + 1];
+   params2[0] = userId;
+   for (int i = 0; i < taskIds.size(); i++) {
+    params2[i + 1] = taskIds.get(i);
+   }
+   updatedRows += jdbcTemplate.update(sqlSet0, params2);
+  } else {
+   String sqlSet0 = "UPDATE task SET status = 0 WHERE user_id = ?";
+   updatedRows = jdbcTemplate.update(sqlSet0, userId);
+  }
+
+  return updatedRows;
  }
 
 }
