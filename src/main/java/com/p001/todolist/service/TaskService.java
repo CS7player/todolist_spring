@@ -16,16 +16,16 @@ public class TaskService {
  @Autowired
  private JdbcTemplate jdbcTemplate;
 
+ // Adding new Task!!!
  public int insertTask(Long userId, String taskDescription) {
   String sql = "INSERT INTO task (user_id, task,status, created_at) VALUES (?, ?,0, ?)";
   long createdAt = Instant.now().getEpochSecond();
-
   return jdbcTemplate.update(sql, userId, taskDescription, createdAt);
  }
 
+ // Getting the Record based on the User_id!!!
  public List<Task> getTasksByUserId(Long userId) {
   String sql = "SELECT id, user_id, task,status, created_at FROM task WHERE user_id = ?";
-
   RowMapper<Task> rowMapper = (rs, rowNum) -> {
    Task task = new Task();
    task.setId(rs.getLong("id"));
@@ -35,10 +35,10 @@ public class TaskService {
    task.setCreatedAt(rs.getLong("created_at"));
    return task;
   };
-
   return jdbcTemplate.query(sql, rowMapper, userId);
  }
 
+ // change the status which selected and not selected mapped with the user_id!!!
  public int updateStatus(List<Integer> taskIds, Long userId) {
   if (userId == null) {
    return 0;
@@ -64,7 +64,6 @@ public class TaskService {
    String sqlSet0 = "UPDATE task SET status = 0 WHERE user_id = ?";
    updatedRows = jdbcTemplate.update(sqlSet0, userId);
   }
-
   return updatedRows;
  }
 

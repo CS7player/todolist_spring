@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TaskRepository extends CrudRepository<Task, Long> {
-    // No need to write custom INSERT query.
-    // Use save() method provided by CrudRepository.
+ // No need to write custom INSERT query.
+ // Use save() method provided by CrudRepository.
 }

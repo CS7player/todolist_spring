@@ -63,21 +63,20 @@ public class TaskController {
  }
 
  @PutMapping("/update")
-public ResponseEntity<Map<String, Object>> updateStatus(@RequestBody Map<String, Object> request){
- Map<String, Object> response = new HashMap<>();
- try {
-  Long userId = Long.valueOf(request.get("user_id").toString());
-  List<Integer> taskIds = (List<Integer>) request.get("ids");
-  int updatedCount = taskService.updateStatus(taskIds,userId);
-  response.put("status", true);
-  response.put("msg", updatedCount + " task(s) updated successfully.");
-  return ResponseEntity.ok(response);
- } catch (Exception ex) {
-  response.put("status", false);
-  response.put("error", "Failed to update tasks");
-  return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+ public ResponseEntity<Map<String, Object>> updateStatus(@RequestBody Map<String, Object> request) {
+  Map<String, Object> response = new HashMap<>();
+  try {
+   Long userId = Long.valueOf(request.get("user_id").toString());
+   List<Integer> taskIds = (List<Integer>) request.get("ids");
+   int updatedCount = taskService.updateStatus(taskIds, userId);
+   response.put("status", true);
+   response.put("msg", updatedCount + " task(s) updated successfully.");
+   return ResponseEntity.ok(response);
+  } catch (Exception ex) {
+   response.put("status", false);
+   response.put("error", "Failed to update tasks");
+   return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+  }
  }
-}
-
 
 }
