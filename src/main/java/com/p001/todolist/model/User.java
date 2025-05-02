@@ -20,10 +20,8 @@ public class User {
 
  @PrePersist
  protected void onCreate() {
-  this.createdAt = Instant.now().getEpochSecond(); // Unix timestamp
+  this.createdAt = Instant.now().getEpochSecond();
  }
-
- // Getters and setters
 
  public Long getId() {
   return id;

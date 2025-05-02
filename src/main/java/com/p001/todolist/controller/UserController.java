@@ -27,18 +27,12 @@ public class UserController {
  @PostMapping("/add")
  public ResponseEntity<HashMap<String, Object>> createUser(@RequestBody User user) {
   HashMap<String, Object> response = new HashMap<>();
-
   try {
-   // Save the user to the database
    User savedUser = userRepository.save(user);
-
-   // Prepare the response data
    response.put("status", true);
    response.put("data", savedUser);
-
-   return ResponseEntity.ok(response); // Return the saved user with 200 OK status
+   return ResponseEntity.ok(response);
   } catch (DataIntegrityViolationException ex) {
-   // Handle unique constraint violation (e.g., duplicate username)
    response.put("status", false);
    response.put("error", "Username already exists, please choose another one.");
    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -50,13 +44,11 @@ public class UserController {
   Optional<User> existingUser = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword());
   HashMap<String, Object> response = new HashMap<>();
   if (existingUser.isPresent()) {
-   // User found, return a success message
    response.put("status", true);
    response.put("msg", "Login successful");
-   response.put("data",existingUser);
+   response.put("data", existingUser);
    return ResponseEntity.ok(response);
   } else {
-   // User not found, return an error message
    response.put("status", false);
    response.put("msg", "Invalid username or password");
    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
