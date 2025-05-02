@@ -36,7 +36,18 @@ public class TaskService {
    return task;
   };
 
+  
   return jdbcTemplate.query(sql, rowMapper, userId);
+ }
+
+ public int updateStatus(List<Integer> taskIds) {
+  if (taskIds == null || taskIds.isEmpty()) {
+   return 0;
+  }
+ 
+  String placeholders = String.join(",", taskIds.stream().map(id -> "?").toList());
+  String sql = "UPDATE task SET status = 1 WHERE id IN (" + placeholders + ")";
+  return jdbcTemplate.update(sql, taskIds.toArray());
  }
 
 }
