@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.p001.todolist.model.Profile;
-import com.p001.todolist.model.Task;
 import com.p001.todolist.repository.ProfileRepository;
 import com.p001.todolist.service.ProfileService;
 import com.p001.todolist.service.S3Service;
