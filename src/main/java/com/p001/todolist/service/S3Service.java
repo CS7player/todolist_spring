@@ -21,16 +21,12 @@ public class S3Service {
  @Value("${aws.bucketName}")
  private String bucketName;
 
- @Value("${aws.accessKey}")
- private String accessKey;
-
- @Value("${aws.secretKey}")
- private String secretKey;
-
  private final S3Client s3Client;
+ private final S3Presigner s3Presigner;
 
- public S3Service(S3Client s3Client) {
+ public S3Service(S3Client s3Client, S3Presigner s3Presigner) {
   this.s3Client = s3Client;
+  this.s3Presigner = s3Presigner;
  }
 
  public String generateUploadUrl(String filename) {
@@ -40,7 +36,12 @@ public class S3Service {
     .contentType("image/jpeg")
     .build();
 
-  return getPresignedUrl(request);
+  PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+    .signatureDuration(Duration.ofMinutes(5))
+    .putObjectRequest(request)
+    .build();
+
+  return s3Presigner.presignPutObject(presignRequest).url().toString();
  }
 
  public String generateDownloadUrl(String key) {
@@ -49,31 +50,11 @@ public class S3Service {
     .key(key)
     .build();
 
-  return getPresignedUrl(request);
- }
-
- private String getPresignedUrl(Object request) {
-  // Create the S3Presigner with credentials
-  S3Presigner presigner = S3Presigner.builder()
-    .region(Region.of("us-east-1")) // Adjust the region as necessary
-    .credentialsProvider(StaticCredentialsProvider.create(
-      AwsBasicCredentials.create(accessKey, secretKey))) // Using Spring @Value
+  GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+    .signatureDuration(Duration.ofHours(1))
+    .getObjectRequest(request)
     .build();
 
-  if (request instanceof PutObjectRequest) {
-   PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-     .signatureDuration(Duration.ofMinutes(5))
-     .putObjectRequest((PutObjectRequest) request)
-     .build();
-   return presigner.presignPutObject(presignRequest).url().toString();
-  } else if (request instanceof GetObjectRequest) {
-   GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-     .signatureDuration(Duration.ofHours(1))
-     .getObjectRequest((GetObjectRequest) request)
-     .build();
-   return presigner.presignGetObject(presignRequest).url().toString();
-  }
-
-  return null; // You can return an error or throw an exception here for invalid request type
+  return s3Presigner.presignGetObject(presignRequest).url().toString();
  }
 }

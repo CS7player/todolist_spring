@@ -1,8 +1,10 @@
 package com.p001.todolist.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.p001.todolist.model.Profile;
+import com.p001.todolist.model.Task;
 import com.p001.todolist.repository.ProfileRepository;
+import com.p001.todolist.service.ProfileService;
 import com.p001.todolist.service.S3Service;
 
 @RestController
@@ -21,10 +25,12 @@ public class ProfileController {
 
  private final S3Service s3Service;
  private final ProfileRepository profileRepository;
+ private final ProfileService profileService;
 
- public ProfileController(S3Service s3Service, ProfileRepository profileRepository) {
+ public ProfileController(S3Service s3Service, ProfileRepository profileRepository, ProfileService profileService) {
   this.s3Service = s3Service;
   this.profileRepository = profileRepository;
+  this.profileService = profileService;
  }
 
  @GetMapping("/upload-url")
@@ -66,9 +72,19 @@ public class ProfileController {
   return ResponseEntity.ok(Map.of("status", "success"));
  }
 
- @GetMapping("/get")
- public ResponseEntity<List<Profile>> getAllImages() {
-  List<Profile> profiles = (List<Profile>) profileRepository.findAll();
-  return ResponseEntity.ok(profiles);
+ @PostMapping("/get")
+ public ResponseEntity<Map<String, Object>> getProfileImages(@RequestBody Map<String, Object> request) {
+  Map<String, Object> response = new HashMap<>();
+  try {
+   Long userId = Long.valueOf(request.get("user_id").toString());
+   List<Profile> profiles = profileService.getProfileImages(userId);
+   response.put("status", true);
+   response.put("data", profiles);
+   return ResponseEntity.ok(response);
+  } catch (Exception ex) {
+   response.put("status", false);
+   response.put("error", "Failed to fetch tasks");
+   return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+  }
  }
 }
