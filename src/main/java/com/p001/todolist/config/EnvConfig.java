@@ -1,40 +1,46 @@
 package com.p001.todolist.config;
 
-import io.github.cdimascio.dotenv.Dotenv;
 import javax.sql.DataSource;
-import com.zaxxer.hikari.HikariDataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 public class EnvConfig {
 
  @Bean
  public DataSource dataSource() {
-  Dotenv dotenv = Dotenv.load();
+  // Get environment variables directly
+  String dbUrl = System.getenv("DB_URL");
+  String dbUsername = System.getenv("DB_USERNAME");
+  String dbPassword = System.getenv("DB_PASSWORD");
 
+  // Create the HikariDataSource and configure it
   HikariDataSource ds = new HikariDataSource();
-  ds.setJdbcUrl(dotenv.get("DB_URL"));
-  ds.setUsername(dotenv.get("DB_USERNAME"));
-  ds.setPassword(dotenv.get("DB_PASSWORD"));
+  ds.setJdbcUrl(dbUrl);
+  ds.setUsername(dbUsername);
+  ds.setPassword(dbPassword);
   return ds;
  }
 
  @Bean
  public AwsS3Config awsS3Config() {
-  Dotenv dotenv = Dotenv.load();
-  System.setProperty("ACCESS_KEY_ID", dotenv.get("ACCESS_KEY_ID"));
-  System.setProperty("SECRET_ACCESS_KEY", dotenv.get("SECRET_ACCESS_KEY"));
-  System.setProperty("BUCKET_NAME", dotenv.get("BUCKET_NAME"));
-  System.setProperty("REGION", dotenv.get("REGION"));
+  // Get AWS credentials from environment variables
+  String accessKeyId = System.getenv("ACCESS_KEY_ID");
+  String secretAccessKey = System.getenv("SECRET_ACCESS_KEY");
+  String bucketName = System.getenv("BUCKET_NAME");
+  String region = System.getenv("REGION");
 
+  // Set AWS properties as system properties (if required by the AWS SDK)
+  System.setProperty("ACCESS_KEY_ID", accessKeyId);
+  System.setProperty("SECRET_ACCESS_KEY", secretAccessKey);
+  System.setProperty("BUCKET_NAME", bucketName);
+  System.setProperty("REGION", region);
 
-  // String accessKeyId = dotenv.get("ACCESS_KEY_ID");
-  // String secretAccessKey = dotenv.get("SECRET_ACCESS_KEY");
-  // Assuming you have a class like AwsS3Config to store the credentials
+  // Create and return the AWS S3 configuration
   AwsS3Config awsS3Config = new AwsS3Config();
-  // awsS3Config.setAccessKeyId(accessKeyId);
-  // awsS3Config.setSecretAccessKey(secretAccessKey);
   return awsS3Config;
  }
 }
