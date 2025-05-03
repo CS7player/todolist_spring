@@ -14,9 +14,10 @@ public class CorsConfig {
    @Override
    public void addCorsMappings(CorsRegistry registry) {
     registry.addMapping("/**")
-      .allowedOrigins("*") // Allows all origins (no credentials)
+      .allowedOrigins("https://todolist-angular-two.vercel.app") // Allows all origins (no credentials)
       .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-      .allowedHeaders("*");
+      .allowedHeaders("*")
+      .allowCredentials(true);;
    }
   };
  }
