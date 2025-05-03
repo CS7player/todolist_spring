@@ -8,8 +8,7 @@ WORKDIR /app
 VOLUME /tmp
 
 # Copy your built JAR file into the container
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
+COPY target/todolist-0.0.1-SNAPSHOT.jar app.jar
 
 # Expose the correct port your app uses
 EXPOSE 4777
