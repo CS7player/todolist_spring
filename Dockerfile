@@ -1,17 +1,12 @@
-# Use a lightweight Java image
-FROM eclipse-temurin:17-jdk-jammy
-
-# Set working directory (optional, helps with structure)
+# First stage: build the app
+FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
+COPY . .
+RUN mvn clean package -DskipTests
 
-# Add a volume to store logs if needed
-VOLUME /tmp
-
-# Copy your built JAR file into the container
-COPY target/todolist-0.0.1-SNAPSHOT.jar app.jar
-
-# Expose the correct port your app uses
+# Second stage: run the app
+FROM eclipse-temurin:17-jdk-jammy
+WORKDIR /app
+COPY --from=build /app/target/todolist-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 4777
-
-# Run the JAR file
 ENTRYPOINT ["java", "-jar", "app.jar"]
