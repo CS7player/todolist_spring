@@ -22,7 +22,12 @@ public class EnvConfig {
 
  @Bean
  public AwsS3Config awsS3Config() {
-  // Dotenv dotenv = Dotenv.load();
+  Dotenv dotenv = Dotenv.load();
+  System.setProperty("ACCESS_KEY_ID", dotenv.get("ACCESS_KEY_ID"));
+  System.setProperty("SECRET_ACCESS_KEY", dotenv.get("SECRET_ACCESS_KEY"));
+  System.setProperty("BUCKET_NAME", dotenv.get("BUCKET_NAME"));
+  System.setProperty("REGION", dotenv.get("REGION"));
+
 
   // String accessKeyId = dotenv.get("ACCESS_KEY_ID");
   // String secretAccessKey = dotenv.get("SECRET_ACCESS_KEY");
